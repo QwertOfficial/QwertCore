@@ -2755,7 +2755,7 @@ function QwertCore.DrawCall()
 							end
 							
 							--Update Popup
-							if GUI:BeginPopupModal("Download Updates", true, GUI.WindowFlags_NoScrollbar + GUI.WindowFlags_NoScrollWithMouse + GUI.WindowFlags_NoCollapse + GUI.WindowFlags_NoSavedSettings + GUI.WindowFlags_NoResize) then
+							if GUI:BeginPopupModal("Download Updates", true, GUI.WindowFlags_NoScrollbar + GUI.WindowFlags_NoScrollWithMouse + GUI.WindowFlags_NoCollapse + GUI.WindowFlags_NoSavedSettings + GUI.WindowFlags_NoResize + GUI.WindowFlags_AlwaysAutoResize) then
 								GUI:PushTextWrapPos(500)
 								GUI:Text(GetString("This will overwrite your current QwertCore.\n"))
 								GUI:TextColored(1,1,0,1,GetString("After the update minion will be reloaded.\n")) 								
@@ -2819,7 +2819,7 @@ function QwertCore.DrawCall()
 							end
 							
 							--Update Popup
-							if GUI:BeginPopupModal("Download Updates", true, GUI.WindowFlags_NoScrollbar + GUI.WindowFlags_NoScrollWithMouse + GUI.WindowFlags_NoCollapse + GUI.WindowFlags_NoSavedSettings + GUI.WindowFlags_NoResize) then
+							if GUI:BeginPopupModal("Download Updates", true, GUI.WindowFlags_NoScrollbar + GUI.WindowFlags_NoScrollWithMouse + GUI.WindowFlags_NoCollapse + GUI.WindowFlags_NoSavedSettings + GUI.WindowFlags_NoResize + GUI.WindowFlags_AlwaysAutoResize) then
 								GUI:PushTextWrapPos(500)
 								GUI:Text(GetString("This will overwrite your current healer reactions.\n"))
 								GUI:Text(GetString("A backup of your files will be created in ..LuaMods/TensorReactions/GeneralTriggers/Qwert.\n")) 								
