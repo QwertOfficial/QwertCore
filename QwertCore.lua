@@ -1,6 +1,6 @@
 QwertCore = {}
 
-QwertCore.version = "0.0.1"
+QwertCore.version = "0.0.2"
 
 QwertCore.GUI = {
     open = false,
