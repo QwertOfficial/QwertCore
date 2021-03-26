@@ -1,6 +1,6 @@
 QwertCore = {}
 
-QwertCore.version = "0.0.2"
+QwertCore.version = "0.0.3"
 
 QwertCore.GUI = {
     open = false,
@@ -337,8 +337,21 @@ QwertCore.Settings = {
 			modifierS = false,
 			modifierA = false,
 		},
-		PartyCo = {
+		PartyCu = {
 			index = 12,
+			name = "CU (P)",
+			visible = false,
+			bool = true,
+			menu = "C. Unconscious",
+			tooltip = "Enable/Disable Collective Unconscious",
+			key = -1,
+			keyname = "None",
+			modifierC = false,
+			modifierS = false,
+			modifierA = false,
+		},
+		PartyCo = {
+			index = 13,
 			name = "CO (P)",
 			visible = false,
 			bool = true,
@@ -351,7 +364,7 @@ QwertCore.Settings = {
 			modifierA = false,
 		},
 		PartyAh = {
-			index = 13,
+			index = 14,
 			name = "AH (P)",
 			visible = false,
 			bool = true,
@@ -364,7 +377,7 @@ QwertCore.Settings = {
 			modifierA = false,
 		},
 		PartyH = {
-			index = 14,
+			index = 15,
 			name = "Helios (P)",
 			visible = false,
 			bool = true,
@@ -377,7 +390,7 @@ QwertCore.Settings = {
 			modifierA = false,
 		},
 		PartyEd = {
-			index = 15,
+			index = 16,
 			name = "ED (P)",
 			visible = false,
 			bool = true,
@@ -390,7 +403,7 @@ QwertCore.Settings = {
 			modifierA = false,
 		},
 		PartyAb = {
-			index = 16,
+			index = 17,
 			name = "AB (P)",
 			visible = false,
 			bool = true,
@@ -403,7 +416,7 @@ QwertCore.Settings = {
 			modifierA = false,
 		},
 		PartyBII = {
-			index = 17,
+			index = 18,
 			name = "BII (P)",
 			visible = false,
 			bool = true,
@@ -416,25 +429,12 @@ QwertCore.Settings = {
 			modifierA = false,
 		},
 		PartyB = {
-			index = 18,
+			index = 19,
 			name = "B (P)",
 			visible = false,
 			bool = true,
 			menu = "Benefic",
 			tooltip = "Enable/Disable Benefic for party members",
-			key = -1,
-			keyname = "None",
-			modifierC = false,
-			modifierS = false,
-			modifierA = false,
-		},
-		PartyCu = {
-			index = 19,
-			name = "CU (P)",
-			visible = false,
-			bool = true,
-			menu = "Benefic ",
-			tooltip = "Enable/Disable Collective Unconscious",
 			key = -1,
 			keyname = "None",
 			modifierC = false,
@@ -541,7 +541,7 @@ QwertCore.Settings = {
 			name = "Heal (T)",
 			visible = false,
 			bool = true,
-			menu = "Heal",
+			menu = "Heal Tank",
 			tooltip = "Enable/Disable Heals for Tanks",
 			key = -1,
 			keyname = "None",
@@ -632,7 +632,7 @@ QwertCore.Settings = {
 			name = "Heals (P)",
 			visible = false,
 			bool = true,
-			menu = "Heal",
+			menu = "Heal Party",
 			tooltip = "Enable/Disable Heals for party members",
 			key = -1,
 			keyname = "None",
@@ -1643,9 +1643,9 @@ QwertCore.Settings = {
 			tooltip = "Enable/Disable Heals",
 			key = -1,
 			keyname = "None",
-			modifierC = nil,
-			modifierS = nil,
-			modifierA = nil,
+			modifierC = false,
+			modifierS = false,
+			modifierA = false,
 		},
 		TankHeal = {
 			index = 2,
@@ -2311,7 +2311,6 @@ QwertCore.Settings = {
 			modifierS = false,
 			modifierA = false,
 		},
-	},
 		UsePrepull = {
 			index = 27,
 			name = "Prepull",
@@ -2325,6 +2324,7 @@ QwertCore.Settings = {
 			modifierS = false,
 			modifierA = false,
 		},
+	},
 }
 
 QwertCore.KeyCodes =
@@ -2532,6 +2532,10 @@ local valid = QwertCore.valid
 
 function QwertCore.LoadSettings()
 	local tbl = FileLoad(ModuleSettings)
+	if tbl == nil then
+		local file = io.open(ModulePath..'Settings.lua', 'w')
+		file:close()
+	end
 	local function scan(tbl,tbl2,depth)
 		depth = depth or 0
 		if valid(2,tbl,tbl2) then
@@ -2556,9 +2560,25 @@ local PreviousSave,lastcheck = {},0
 function QwertCore.save(force)
 	if (force or TimeSince(lastcheck) > 30000) then
 		lastcheck = Now()
-		if not table.deepcompare(QwertCore.Settings,PreviousSave) then
-			FileSave(ModuleSettings,QwertCore.Settings)
-			PreviousSave = table.deepcopy(QwertCore.Settings)
+		local base = table.deepcopy(QwertCore.Settings)
+		for k, v in pairs(base) do
+			if k == "AstEvHotbar" or k == "AstSavHotbar" or k == "SchEvHotbar" or k == "SchSavHotbar" or k == "WhmEvHotbar" or k == "WhmSavHotbar" then
+				for m,n in pairs(v) do
+					n.name = nil
+					n.index = nil
+					n.menu = nil
+					n.tooltip = nil
+				end
+			end
+		end
+		if not table.deepcompare(base,PreviousSave) then
+			local tbl = FileLoad(ModuleSettings)
+			if tbl == nil then
+				local file = io.open(ModulePath..'Settings.lua', 'w')
+				file:close()
+			end
+			FileSave(ModuleSettings,base)
+			PreviousSave = table.deepcopy(base)
 		end
 	end
 end
@@ -2662,8 +2682,6 @@ function QwertCore.DrawCall()
     if (gamestate == FFXIV.GAMESTATE.INGAME) and not Player.onlinestatus ~= 15 then
 		if (QwertCore.GUI.open) then
 			local c = 0
-			--local WindowSizeX,WindowSizeY = 350,400
-			--local SubWindowSizeX,SubWindowSizeY = 300,400
 			local WindowSizeX,WindowSizeY = 400,450
 			local SubWindowSizeX,SubWindowSizeY = 350,450
 			local Style = GUI:GetStyle()
@@ -2704,7 +2722,7 @@ function QwertCore.DrawCall()
 					end
 					GUI:Separator()
 
-					-- Tab Contents.
+					-- Tab Contents
 					-- General Tab
 					if Tabs.CurrentTab == 1 then
 						-- Update Group
@@ -2870,7 +2888,7 @@ function QwertCore.DrawCall()
 							GUI:TreePop()
 						end
 						
-						if GUI:TreeNode("Savages##DrawingsGeneral") then
+						if GUI:TreeNode("Eden's Verse##DrawingsGeneralVerse") then
 							-- e5s
 							GUI:Separator()
 							local Str = "Clouds (E5s)"
@@ -2971,7 +2989,11 @@ function QwertCore.DrawCall()
 								save(true)
 							end
 							GUI:NextColumn()
+							
+							GUI:TreePop()
+						end
 						
+						if GUI:TreeNode("Eden's Promise##DrawingsGeneralPromise") then						
 							-- e9s
 							GUI:Separator()
 							local Str = "Wide Angle & Anti Air (E9s)"
@@ -3104,6 +3126,7 @@ function QwertCore.DrawCall()
 							
 							GUI:TreePop()
 						end
+						
 					-- Ast Tab
 					elseif Tabs.CurrentTab == 2 then
 						-- Everywhere Group
